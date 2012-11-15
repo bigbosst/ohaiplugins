@@ -11,7 +11,7 @@ Recomended Installation with the ohai chef community cookbook
 
 ### Example Install with Cookbook
 
-place this and any other plugins in an 'ohai_plugins' folder in the files/default/ path insid of 'yourawesomecookbook'
+place this and any other plugins in an 'ohai_plugins' folder in the files/default/ path inside of 'yourawesomecookbook'
 
 	node.set['ohai']['plugins']  = {'yourawesomecookbook' => 'ohai_plugins'}
 	include_recipe "ohai::default"
