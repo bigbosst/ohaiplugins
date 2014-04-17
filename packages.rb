@@ -16,23 +16,26 @@
 # limitations under the License.
 #
 
-provides "pci_devices"
+provides "packages"
 
-pci_devices Mash.new
+require_plugin "platform"
 
-# PCI ID / TYPE / VENDOR / DEVICE NAME / -rREVISION / SUBVENDOR / SUBSYSTEM NAME
-re=Regexp.new("(.*) \"(.*)\" \"(.*)\" \"(.*)\" -r(.*) \"(.*)\" \"(.*)\"")
+packages Mash.new
 
-devices=Array.new
+installed=Array.new
 
-if File.exists?("/usr/bin/lspci")
-  `/usr/bin/lspci -m`.each_line do |line|
+case platform_family
+when 'debian'
+  re=Regexp.new("^ii*")
+  devices=Array.new
+  `/usr/bin/dpkg -l`.each_line do |line|
     data=re.match(line)
     if data then
-	  output = pci_devices[data[1]] = { "devicename" => data[4], "type" => data[2], "subsystem" => data[7], "vendor" => data[3], "subvendor" => data[6], "revision" => data[5] }
-	end
+	  stat, pn, ver, arch, *desc = line.split
+	  package_output = packages[pn] = { "version" => ver, "architecture"=> arch, "description" => desc.join(" ") }
+    end
   end
-  eval(output)
+  eval(package_output)
 else
-  Ohai::Log.debug("Skipping PCI, cannot find /usr/bin/lspci")
+  Ohai::Log.debug("Skipping Packages, cannot find package listing")
 end
